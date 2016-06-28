@@ -1,0 +1,15 @@
+<form name="myForm">
+  <div class="input-group">
+    <span class="input-group-addon">SKU</span>
+    <input type="text" class="form-control" name="sku" ng-model="currentItem.item.sku" required>
+  </div>
+
+  <div class="input-group">
+    <span class="input-group-addon">Descripcion</span>
+    <input type="text" class="form-control" name="description" ng-model="currentItem.item.description" required>
+  </div>
+
+  <a href="#/" class="btn" role="button">Cancel</a>
+  <button ng-click="currentItem.save()" class="btn">Save</button>
+  <button ng-click="currentItem.destroy()" ng-show="currentItem.project.$id" class="btn btn-danger">Delete</button>
+</form>

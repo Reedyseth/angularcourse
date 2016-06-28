@@ -1,0 +1,15 @@
+{
+    "items": [{
+	"sku": "001",
+	"description": "Foo Bar 1"
+    }, {
+	"sku": "002",
+	"description": "Foo Bar 2"
+    }, {
+	"sku": "003",
+	"description": "Foo Bar 3"
+    }, {
+	"sku": "004",
+	"description": "Foo Bar 4"
+    }]
+}

@@ -1,0 +1,19 @@
+<div class="panel panel-default">
+  <div class="panel-heading">Articulos</div>
+  <table class="table">
+    <thead>
+      <tr>
+	<th>SKU</th>
+	<th>Descripcion</th>
+	<th><a href="#/new"><i class="glyphicon glyphicon-plus-sign"></i></a></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="(key, itm) in itemList.items">
+	<td>{{itm.sku}}</td>
+	<td>{{itm.description}}</td>
+	<td><a ng-href="#/edit/{{key}}"><i class="glyphicon glyphicon-pencil"></i></a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
