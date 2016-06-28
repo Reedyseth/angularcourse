@@ -8,22 +8,42 @@ var config = {
 
 var app = angular.module('itemsApp',['ngRoute', 'firebase']);
 
-	app.service('fbRef', function(){
-		firebase.initializeApp(config);
-	});
+app.service('fbRef', function(){
+	return firebase.initializeApp(config);
+});
 
-	app.service('Items', function(){
+app.service('fbAuth', function($q, fbRef) {
+	var auth;
+	return function() {
+		if (auth) return $q.when(auth);
+	    var authObj = fbRef.auth();
+	    if (authObj.currentUser) {
+		return $q.when(auth = authObj.currentUser);
+	    }
+	    var deferred = $q.defer();
+	    authObj.signInAnonymously().then(function(authData) {
+		auth = authData;
+		deferred.resolve(authData);
+	    });
+	    return deferred.promise;
+	}
+});
+
+app.service('Items', function($q, fbRef, fbAuth){
 	this.fetch = function(){
-			return [{
-					"sku"        : "001",
-					"description": "Foo Bar 1"
-				    }, {
-					"sku"        : "002",
-					"description": "Foo Bar 2"
-				    }, {
-					"sku"        : "003",
-					"description": "Foo Bar 3"
-				    }];
+		fbAuth().then(function(auth){
+			console.log(auth);
+		});
+		return [{
+				"sku"        : "001",
+				"description": "Foo Bar 1"
+			    }, {
+				"sku"        : "002",
+				"description": "Foo Bar 2"
+			    }, {
+				"sku"        : "003",
+				"description": "Foo Bar 3"
+			    }];
 	}
 });
 
