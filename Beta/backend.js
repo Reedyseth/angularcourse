@@ -61,7 +61,13 @@ app.config(function($routeProvider){
 	    resolve: resolveItems
 	})
 	.when('/new', {
-		controller:'ItemNewController as itemList',
+		controller:'ItemNewController as currentItem',
+	    templateUrl:'form.html',
+	    resolve: resolveItems
+
+	})
+	.when('/edit/:itemId', {
+		controller:'ItemEditController as currentItem',
 	    templateUrl:'form.html',
 	    resolve: resolveItems
 
@@ -75,10 +81,26 @@ app.controller('ItemListController', function(items) {
 app.controller('ItemNewController', function($location, fbRef) {
 	var currentItem = this;
 	currentItem.save = function() {
-	    var newPostKey = fbRef.database().ref().child('items').push().key
+	    var newPostKey = fbRef.database().ref().child('items').push().key;
 	    var updates = {};
 	    updates['/items/' + newPostKey] = currentItem.item;
 	    fbRef.database().ref().update(updates);
 	    $location.path('/');
 	};
-    });
+});
+
+app.controller('ItemEditController', function($location, $routeParams, items) {
+	var currentItem = this;
+	var itemId = $routeParams.itemId;
+
+	currentItem.items = items;
+	currentItem.item = currentItem.items[itemId];
+
+	currentItem.save = function() {
+            var adaNameRef = firebase.database().ref('items/' + itemId);
+	    // Modify the 'first' and 'last' properties, but leave other data at
+	    // adaNameRef unchanged.
+	    adaNameRef.update(currentItem.item);
+	    $location.path('/');
+	};
+});
