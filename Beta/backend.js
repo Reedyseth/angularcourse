@@ -30,35 +30,55 @@ app.service('fbAuth', function($q, fbRef) {
 });
 
 app.service('Items', function($q, fbRef, fbAuth){
+	var self = this;
 	this.fetch = function(){
-		fbAuth().then(function(auth){
-			console.log(auth);
-		});
-		return [{
-				"sku"        : "001",
-				"description": "Foo Bar 1"
-			    }, {
-				"sku"        : "002",
-				"description": "Foo Bar 2"
-			    }, {
-				"sku"        : "003",
-				"description": "Foo Bar 3"
-			    }];
+		if (this.items) return $q.when(this.items);
+		return fbAuth().then(function(auth) {
+				var deferred = $q.defer();
+				var ref = fbRef.database().ref('items');
+				ref.on('value', function(snapshot) {
+				    self.items = snapshot.val();
+				    deferred.resolve(self.items);
+				});
+
+				//Remove projects list when no longer needed.
+				//ref.onDisconnect().remove();
+				return deferred.promise;
+	    });
 	}
 });
 
 app.config(function($routeProvider){
+	resolveItems = {
+		items: function(Items){
+			return Items.fetch();
+		}
+	}
     $routeProvider
 	.when('/', {
 	    controller:'ItemListController as itemList',
 	    templateUrl:'list.html',
-	    resolve: {
-	    	items: function(Items){
-	    		return Items.fetch();
-	    	}
-	    }
+	    resolve: resolveItems
+	})
+	.when('/new', {
+		controller:'ItemNewController as itemList',
+	    templateUrl:'form.html',
+	    resolve: resolveItems
+
 	});
 });
+
 app.controller('ItemListController', function(items) {
     this.items = items;
 });
+
+app.controller('ItemNewController', function($location, fbRef) {
+	var currentItem = this;
+	currentItem.save = function() {
+	    var newPostKey = fbRef.database().ref().child('items').push().key
+	    var updates = {};
+	    updates['/items/' + newPostKey] = currentItem.item;
+	    fbRef.database().ref().update(updates);
+	    $location.path('/');
+	};
+    });
